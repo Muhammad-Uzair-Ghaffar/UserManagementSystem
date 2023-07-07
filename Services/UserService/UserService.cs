@@ -7,7 +7,6 @@ using UserManagementSystem.Models;
 
 namespace UserManagementSystem.Services.UserService
 {
-    
     public class UserService : IUserService
     {
         private static List<User> users = new List<User>
@@ -16,44 +15,45 @@ namespace UserManagementSystem.Services.UserService
             new User { Id = 1,Name = "saim"}
         }; 
 
-        public async Task<ServiceResponse<List<GetUserDto>>> AddUser(AddUserDto newUser)
+        public async Task<ServiceResponse<List<User>>> AddUser(User newUser)
         {
-            ServiceResponse<List<GetUserDto>> serviceResponse = new ServiceResponse<List<GetUserDto>>();
+            ServiceResponse<List<User>> serviceResponse = new ServiceResponse<List<User>>();
             users.Add(newUser);
             serviceResponse.Data = users;
             return serviceResponse;
         }
 
-        public async Task<ServiceResponse<List<GetUserDto>>>  DeleteUser(int id)
+        public async Task<ServiceResponse<List<User>>>  DeleteUser(int id)
         {
-            ServiceResponse<List<GetUserDto>> serviceResponse = new ServiceResponse<List<GetUserDto>>();
+            ServiceResponse<List<User>> serviceResponse = new ServiceResponse<List<User>>();
             User user = users.First(c=> c.Id == id);
             users.Remove(user);
             serviceResponse.Data = users;
             return serviceResponse;
         }
 
-        public async Task<ServiceResponse<List<GetUserDto>>>  GetAllUsers()
+        public async Task<ServiceResponse<List<User>>>  GetAllUsers()
         {
-            ServiceResponse<List<GetUserDto>> serviceResponse = new ServiceResponse<List<GetUserDto>>();
+            ServiceResponse<List<User>> serviceResponse = new ServiceResponse<List<User>>();
             serviceResponse.Data = users;
             return serviceResponse;
         }
 
-        public async Task<ServiceResponse<GetUserDto>> GetUserById(int id)
+        public async Task<ServiceResponse<User>> GetUserById(int id)
         {
-            ServiceResponse<GetUserDto> serviceResponse = new ServiceResponse<GetUserDto>();
+            ServiceResponse<User> serviceResponse = new ServiceResponse<User>();
             serviceResponse.Data = users.FirstOrDefault(c=> c.Id == id);
             return serviceResponse;
             
         }
 
-        public async Task<ServiceResponse<List<GetUserDto>>>  UpdateUser(int id, User newUser)
+        public async Task<ServiceResponse<List<User>>>  UpdateUser(int id, User newUser)
         {
-            ServiceResponse<List<GetUserDto>> serviceResponse = new ServiceResponse<List<GetUserDto>>();
+            ServiceResponse<List<User>> serviceResponse = new ServiceResponse<List<User>>();
             User user = users.FirstOrDefault(c=> c.Id == id);
             user.Name=newUser.Name;
-            user.email=newUser.email;
+            user.Email=newUser.Email;
+            user.Age=newUser.Age;
             user.Class=newUser.Class;
             Console.WriteLine(newUser.Name);
             serviceResponse.Data=users;

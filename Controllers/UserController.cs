@@ -5,17 +5,13 @@ using System.Collections.Generic;
 using UserManagementSystem.Services.UserService;
 using UserManagementSystem.Dtos.User;
 
-namespace week_1.Controllers
+namespace UserManagementSystem.Controllers
 {
     [ApiController]
     [Route("[controller]")]
     public class UserController: ControllerBase
     {
-        private static List<User> users = new List<User> {
-
-            new User(),
-            new User { Id = 1,Name = "saim"}
-        }; 
+        
         private readonly IUserService _userService;
         
         public UserController(IUserService userService )
@@ -48,7 +44,7 @@ namespace week_1.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult>  AddUser(AddUserDto newUser){
+        public async Task<IActionResult>  AddUser(User newUser){
             
             return Ok(await _userService.AddUser(newUser));
         }
