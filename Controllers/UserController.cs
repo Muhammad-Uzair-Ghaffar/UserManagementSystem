@@ -38,13 +38,13 @@ namespace UserManagementSystem.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult>  UpdateUser(User newUser,int id){
+        public async Task<IActionResult>  UpdateUser(AddUserDto newUser,int id){
             
             return Ok(await _userService.UpdateUser( id , newUser ));
         }
 
         [HttpPost]
-        public async Task<IActionResult>  AddUser(User newUser){
+        public async Task<IActionResult>  AddUser(AddUserDto newUser){
             
             return Ok(await _userService.AddUser(newUser));
         }
