@@ -8,9 +8,9 @@ namespace UserManagementSystem.Dtos.User
 {
     public class AddUserDto
     {
-        public string Name { get; set; } = "Default username";
+        public string Name { get; set; }
         public int Age { get; set; }
-        public string Email { get; set; }="nomail";
-        public DefaultUser Class { get; set; } = DefaultUser.customer;
+        public string Email { get; set; }
+        public Role Class { get; set; }
     }
 }
