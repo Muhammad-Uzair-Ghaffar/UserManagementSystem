@@ -43,9 +43,30 @@ namespace UserManagementSystem.Controllers
         public async Task<IActionResult> DeleteUser(Guid id)
         {
             ServiceResponse<List<GetUserDto>> serviceResponse = new ServiceResponse<List<GetUserDto>>();
-            List<User> users = await _userService.DeleteUser(id);
-            serviceResponse.Data = (users.Select(c => _mapper.Map<GetUserDto>(c)).ToList());
-            return Ok(serviceResponse);
+            if (!ModelState.IsValid)
+            {
+                List<string> errors = ModelState.Values.SelectMany((v) => v.Errors).Select(e => e.ErrorMessage).ToList();
+                serviceResponse.Message = errors[0];
+                serviceResponse.status = Status.BadRequest;
+                return BadRequest(serviceResponse);
+
+            }
+            else
+            {
+                try
+                {
+                    List<User> users = await _userService.DeleteUser(id);
+                    serviceResponse.Data = (users.Select(c => _mapper.Map<GetUserDto>(c)).ToList());
+                    return Ok(serviceResponse);
+                }
+                catch (Exception ex)
+                {
+                    serviceResponse.Message = ex.Message;
+                    serviceResponse.status = Status.BadRequest;
+                    return BadRequest(serviceResponse);
+                }
+            }
+         
         }
 
         [HttpPut("{id}")]
