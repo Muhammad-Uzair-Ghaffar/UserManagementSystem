@@ -24,16 +24,24 @@ namespace UserManagementSystem.Controllers
         [HttpGet("GetAll")]
         public async Task<IActionResult>  Get()
         {
-            List<User> users=await _userService.GetAllUsers();
-            return Ok((users.Select(c => _mapper.Map<GetUserDto>(c)).ToList()));
+            try
+            {
+                List<User> users=await _userService.GetAllUsers();
+                return Ok((users.Select(c => _mapper.Map<GetUserDto>(c)).ToList()));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult>  GetSingle(string id)
         {
             try { 
-            User user = await _userService.GetUserById(id);
-            return Ok(_mapper.Map<GetUserDto>(user));
+                User user = await _userService.GetUserById(id);
+                return Ok(_mapper.Map<GetUserDto>(user));
+                
             }
             catch (Exception ex)
             {
@@ -46,15 +54,15 @@ namespace UserManagementSystem.Controllers
         public async Task<IActionResult> DeleteUser(string id)
         {
             
-                try
-                {
-                    List<User> users = await _userService.DeleteUser(id);
-                    return Ok((users.Select(c => _mapper.Map<GetUserDto>(c)).ToList()));
-                }
-                catch (Exception ex)
-                {
-                    return BadRequest(ex.Message);
-                }
+            try
+            {
+                List<User> users = await _userService.DeleteUser(id);
+                return Ok((users.Select(c => _mapper.Map<GetUserDto>(c)).ToList()));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
          
         }
 
@@ -66,7 +74,6 @@ namespace UserManagementSystem.Controllers
             {
                 List<string> errors = ModelState.Values.SelectMany((v)=> v.Errors).Select(e => e.ErrorMessage).ToList();
                 return BadRequest("", errors[0]);
-
             }
             else
             {

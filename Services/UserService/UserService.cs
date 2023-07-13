@@ -29,7 +29,6 @@ namespace UserManagementSystem.Services.UserService
 
         public async Task<List<User>>  DeleteUser(string id)
         {
-           // ServiceResponse<List<GetUserDto>> serviceResponse = new ServiceResponse<List<GetUserDto>>();
             User user = users.First(c=> c.Id == id);
             users.Remove(user);
             return users ;
@@ -37,21 +36,17 @@ namespace UserManagementSystem.Services.UserService
 
         public async Task<List<User>>  GetAllUsers()
         {
-            //ServiceResponse<List<GetUserDto>> serviceResponse = new ServiceResponse<List<GetUserDto>>();
             return users;
         }
 
         public async Task<User> GetUserById(string id)
-        {
-           // ServiceResponse<GetUserDto> serviceResponse = new ServiceResponse<GetUserDto>();
-           
-            return users.FirstOrDefault(c=> c.Id == id);
+        {  
+            return users.First(c=> c.Id == id);
             
         }
 
         public async Task<List<User>> UpdateUser(string id, User newUser)
         {
-          //  ServiceResponse<List<GetUserDto>> serviceResponse = new ServiceResponse<List<GetUserDto>>();
             User user = users.FirstOrDefault(c=> c.Id == id);
             user.Name=newUser.Name;
             user.Email=newUser.Email;
