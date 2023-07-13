@@ -38,7 +38,8 @@ namespace UserManagementSystem.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult>  GetSingle(string id)
         {
-            try { 
+            try 
+            { 
                 User user = await _userService.GetUserById(id);
                 return Ok(_mapper.Map<GetUserDto>(user));
                 
@@ -69,7 +70,7 @@ namespace UserManagementSystem.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult>  UpdateUser([FromBody]  AddUserDto newUser,string id)
         {
-            ServiceResponse serviceResponse = new ServiceResponse();
+           
             if (!ModelState.IsValid)
             {
                 List<string> errors = ModelState.Values.SelectMany((v)=> v.Errors).Select(e => e.ErrorMessage).ToList();
@@ -85,7 +86,7 @@ namespace UserManagementSystem.Controllers
                 }
                 catch ( Exception ex)
                 {
-                    return BadRequest(ex);
+                    return BadRequest(ex.Message);
                 }
             }
         }
@@ -112,7 +113,7 @@ namespace UserManagementSystem.Controllers
                 }
                 catch (Exception ex)
                 {
-                    return BadRequest(ex);
+                    return BadRequest(ex.Message);
                 }
                 
             }

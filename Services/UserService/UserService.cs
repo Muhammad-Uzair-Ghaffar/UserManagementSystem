@@ -47,12 +47,11 @@ namespace UserManagementSystem.Services.UserService
 
         public async Task<List<User>> UpdateUser(string id, User newUser)
         {
-            User user = users.FirstOrDefault(c=> c.Id == id);
+            User user = users.First(c=> c.Id == id);
             user.Name=newUser.Name;
             user.Email=newUser.Email;
             user.Age=newUser.Age;
             user.Class=newUser.Class;
-            Console.WriteLine(newUser.Name);
             return users; 
         }
 
