@@ -10,7 +10,7 @@ namespace UserManagementSystem.Controllers
 {
    
     [Route("[controller]")]
-    public class UserController: ControllerBase
+    public class UserController: BaseController
     {
         
         private readonly IUserService _userService;
@@ -24,61 +24,48 @@ namespace UserManagementSystem.Controllers
         [HttpGet("GetAll")]
         public async Task<IActionResult>  Get()
         {
-            ServiceResponse<List<GetUserDto>> serviceResponse = new ServiceResponse<List<GetUserDto>>();
             List<User> users=await _userService.GetAllUsers();
-            serviceResponse.Data= (users.Select(c=> _mapper.Map<GetUserDto>(c)).ToList());
-            return Ok(serviceResponse);
+            return Ok((users.Select(c => _mapper.Map<GetUserDto>(c)).ToList()));
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult>  GetSingle(Guid id)
+        public async Task<IActionResult>  GetSingle(string id)
         {
-            ServiceResponse<GetUserDto> serviceResponse = new ServiceResponse<GetUserDto>();
+            try { 
             User user = await _userService.GetUserById(id);
-            serviceResponse.Data = _mapper.Map<GetUserDto>(user);
-            return Ok(serviceResponse);
+            return Ok(_mapper.Map<GetUserDto>(user));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteUser(Guid id)
+        public async Task<IActionResult> DeleteUser(string id)
         {
-            ServiceResponse<List<GetUserDto>> serviceResponse = new ServiceResponse<List<GetUserDto>>();
-            if (!ModelState.IsValid)
-            {
-                List<string> errors = ModelState.Values.SelectMany((v) => v.Errors).Select(e => e.ErrorMessage).ToList();
-                serviceResponse.Message = errors[0];
-                serviceResponse.status = Status.BadRequest;
-                return BadRequest(serviceResponse);
-
-            }
-            else
-            {
+            
                 try
                 {
                     List<User> users = await _userService.DeleteUser(id);
-                    serviceResponse.Data = (users.Select(c => _mapper.Map<GetUserDto>(c)).ToList());
-                    return Ok(serviceResponse);
+                    return Ok((users.Select(c => _mapper.Map<GetUserDto>(c)).ToList()));
                 }
                 catch (Exception ex)
                 {
-                    serviceResponse.Message = ex.Message;
-                    serviceResponse.status = Status.BadRequest;
-                    return BadRequest(serviceResponse);
+                    return BadRequest(ex.Message);
                 }
-            }
          
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult>  UpdateUser([FromBody]  AddUserDto newUser,Guid id)
+        public async Task<IActionResult>  UpdateUser([FromBody]  AddUserDto newUser,string id)
         {
-            ServiceResponse<List<GetUserDto>> serviceResponse = new ServiceResponse<List<GetUserDto>>();
+            ServiceResponse serviceResponse = new ServiceResponse();
             if (!ModelState.IsValid)
             {
                 List<string> errors = ModelState.Values.SelectMany((v)=> v.Errors).Select(e => e.ErrorMessage).ToList();
-                serviceResponse.Message = errors[0];
-                serviceResponse.status = Status.BadRequest;
-                return BadRequest(serviceResponse);
+                return BadRequest("", errors[0]);
 
             }
             else
@@ -87,14 +74,11 @@ namespace UserManagementSystem.Controllers
                 {
                     User user = _mapper.Map<User>(newUser);
                     List<User> users = await _userService.UpdateUser(id, user);
-                    serviceResponse.Data = (users.Select(c => _mapper.Map<GetUserDto>(c)).ToList());
-                    return Ok(serviceResponse);
+                    return Ok((users.Select(c => _mapper.Map<GetUserDto>(c)).ToList()));
                 }
                 catch ( Exception ex)
                 {
-                    serviceResponse.Message = ex.Message;
-                    serviceResponse.status = Status.BadRequest;
-                    return BadRequest(serviceResponse);
+                    return BadRequest(ex);
                 }
             }
         }
@@ -102,12 +86,11 @@ namespace UserManagementSystem.Controllers
         [HttpPost]
         public async Task<IActionResult>  AddUser([FromBody] AddUserDto newUser)
         {
-            ServiceResponse<List<GetUserDto>> serviceResponse = new ServiceResponse<List<GetUserDto>>();
+            
             if (!ModelState.IsValid)
             {
-                serviceResponse.Message = "Insufficient credentials to proceed with request ";
-                serviceResponse.status = Status.BadRequest;
-                return BadRequest(serviceResponse);
+                List<string> errors = ModelState.Values.SelectMany((v) => v.Errors).Select(e => e.ErrorMessage).ToList();
+                return BadRequest("", errors[0]);
 
             }
             else
@@ -115,16 +98,14 @@ namespace UserManagementSystem.Controllers
                 try
                 {
                     User user = _mapper.Map<User>(newUser);
+                    user.Id= Guid.NewGuid().ToString();
                     List<User> users = await _userService.AddUser(user);
-                    serviceResponse.Data = (users.Select(c => _mapper.Map<GetUserDto>(c)).ToList());
-                    return Ok(serviceResponse);
+                    return Ok((users.Select(c => _mapper.Map<GetUserDto>(c)).ToList()));
 
                 }
                 catch (Exception ex)
                 {
-                    serviceResponse.Message = ex.Message;
-                    serviceResponse.status = Status.BadRequest;
-                    return BadRequest(serviceResponse);
+                    return BadRequest(ex);
                 }
                 
             }

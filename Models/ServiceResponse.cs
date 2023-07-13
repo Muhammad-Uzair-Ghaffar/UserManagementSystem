@@ -11,11 +11,11 @@ namespace UserManagementSystem.Models
         BadRequest = 400,
         IncorrectUrl= 404
     }
-    public class ServiceResponse<T>
+    public class ServiceResponse
     {
-        public T Data { get; set; }
+        public object Data { get; set; }
 
-        public Status status  { get; set; } = Status.Success;
+        public Status Status  { get; set; } 
 
         public string Message { get; set; } = null;
     }

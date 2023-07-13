@@ -12,8 +12,8 @@ namespace UserManagementSystem.Services.UserService
     {
         private static List<User> users = new List<User>
         {
-            new User(),
-            new User {Name = "saim"}
+            new User{Id= Guid.NewGuid().ToString()},
+            new User {Id= Guid.NewGuid().ToString(),Name = "saim"}
         }; 
         private readonly IMapper _mapper;
 
@@ -27,7 +27,7 @@ namespace UserManagementSystem.Services.UserService
             return users;
         }
 
-        public async Task<List<User>>  DeleteUser(Guid id)
+        public async Task<List<User>>  DeleteUser(string id)
         {
            // ServiceResponse<List<GetUserDto>> serviceResponse = new ServiceResponse<List<GetUserDto>>();
             User user = users.First(c=> c.Id == id);
@@ -41,7 +41,7 @@ namespace UserManagementSystem.Services.UserService
             return users;
         }
 
-        public async Task<User> GetUserById(Guid id)
+        public async Task<User> GetUserById(string id)
         {
            // ServiceResponse<GetUserDto> serviceResponse = new ServiceResponse<GetUserDto>();
            
@@ -49,7 +49,7 @@ namespace UserManagementSystem.Services.UserService
             
         }
 
-        public async Task<List<User>> UpdateUser(Guid id, User newUser)
+        public async Task<List<User>> UpdateUser(string id, User newUser)
         {
           //  ServiceResponse<List<GetUserDto>> serviceResponse = new ServiceResponse<List<GetUserDto>>();
             User user = users.FirstOrDefault(c=> c.Id == id);

@@ -9,6 +9,6 @@ namespace UserManagementSystem.Dtos.User
 {
     public class GetUserDto : AddUserDto
     {
-        public Guid Id { get; set; }
+        public string Id { get; set; }
     }
 }

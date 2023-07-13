@@ -14,7 +14,7 @@ namespace UserManagementSystem.Models
     public class User
     {
 
-        public Guid Id { get; set; }
+        public string Id { get; set; }
         [Required]
         public string Name { get; set; } 
         public int Age { get; set; }
@@ -22,9 +22,6 @@ namespace UserManagementSystem.Models
        
         public Role Class { get; set; } 
 
-        public User()
-        {
-            Id = Guid.NewGuid();
-        }
+        
     }
 }
