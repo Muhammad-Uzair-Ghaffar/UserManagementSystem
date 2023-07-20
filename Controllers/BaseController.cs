@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using UserManagementSystem.Dtos.User;
 using UserManagementSystem.Models;
-
+using System.Reflection; 
 namespace UserManagementSystem.Controllers
 {
     public class BaseController : ControllerBase
@@ -27,13 +27,25 @@ namespace UserManagementSystem.Controllers
             {
                 Data = value,
                 Message = "Bad request",
-                Status = Status.BadRequest,
+                Status = Status.Failed,
             };
 
             return new BadRequestObjectResult(serviceResponse);
         }
 
 
+        [NonAction]
+        public OkObjectResult Ok(object? value, string message)
+        {
+            ServiceResponse serviceResponse = new ServiceResponse()
+            {
+                Data = value,
+                Message = message,
+                Status = Status.Success,
+            };
+
+            return new OkObjectResult(serviceResponse);
+        }
 
         //made a custom method which returns the BadRequestObjectResult objects ,it is for sending custom mesasge from the controller
 
@@ -45,7 +57,7 @@ namespace UserManagementSystem.Controllers
             {
                 Data = value,
                 Message = message,
-                Status = Status.BadRequest,
+                Status = Status.Failed,
             };
 
             return new BadRequestObjectResult(serviceResponse);

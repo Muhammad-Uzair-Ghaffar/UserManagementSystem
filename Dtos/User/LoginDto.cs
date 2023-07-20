@@ -7,8 +7,9 @@ using UserManagementSystem.Models;
 
 namespace UserManagementSystem.Dtos.User
 {
-    public class GetUserDto : AddUserDto
+    public class LoginDto 
     {
-        public string Id { get; set; }
+        public string Email { get; set; }
+        public string Password { get; set; }
     }
 }

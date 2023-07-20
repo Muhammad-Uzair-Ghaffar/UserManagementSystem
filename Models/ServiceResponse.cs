@@ -7,9 +7,8 @@ namespace UserManagementSystem.Models
 {   
     public enum Status
     {
-        Success= 200,
-        BadRequest = 400,
-        IncorrectUrl= 404
+        Success= 1,
+        Failed = 0,
     }
     public class ServiceResponse
     {

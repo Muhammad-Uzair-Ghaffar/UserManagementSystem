@@ -12,7 +12,10 @@ namespace UserManagementSystem.Services.UserService
         Task<List<User>> GetAllUsers();
          Task<User> GetUserById(string id);
          Task<List<User>> AddUser(User newUser);
-         Task<List<User>> DeleteUser(string id);
-         Task<List<User>> UpdateUser(string id,User newUser);
+         Task<User> DeleteUser(string id);
+         Task<User> UpdateUser(string id,User newUser);
+        Task<User>  Register(User newUser, string password);
+        Task<string> Login(string useremail, string password);
+        Task<bool> UserExists(string useremail);
     }
 }
