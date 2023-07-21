@@ -13,7 +13,7 @@ namespace UserManagementSystem.Controllers
             ServiceResponse serviceResponse = new ServiceResponse()
             {
                 Data = value,
-                Message= "ok",
+                Message= new string[] { "ok"},
                 Status = Status.Success,
             };
             
@@ -23,12 +23,20 @@ namespace UserManagementSystem.Controllers
         //overrided the BadRequest method with my own implementatiom
         public override BadRequestObjectResult BadRequest([ActionResultObjectValue] object? value)
         {
+            Type messageType = value.GetType();
             ServiceResponse serviceResponse = new ServiceResponse()
             {
-                Data = value,
-                Message = "Bad request",
+                Data = null,
                 Status = Status.Failed,
             };
+            if (messageType == typeof(string)) 
+            {
+                serviceResponse.Message = new string[] { value.ToString() };
+            }
+            if (value is List<string> array)
+            {
+                serviceResponse.Message = array.ToArray();
+            }
 
             return new BadRequestObjectResult(serviceResponse);
         }
@@ -40,7 +48,7 @@ namespace UserManagementSystem.Controllers
             ServiceResponse serviceResponse = new ServiceResponse()
             {
                 Data = value,
-                Message = message,
+                Message = new[] { message },
                 Status = Status.Success,
             };
 
@@ -56,7 +64,7 @@ namespace UserManagementSystem.Controllers
             ServiceResponse serviceResponse = new ServiceResponse()
             {
                 Data = value,
-                Message = message,
+                Message = new[] { message },
                 Status = Status.Failed,
             };
 

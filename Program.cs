@@ -21,7 +21,8 @@ builder.Services.AddControllers();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddAutoMapper(typeof(Program));
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddHttpContextAccessor();
+
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -37,6 +38,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                         ValidateAudience = false,
                     };
                 });
+
 
 var app = builder.Build();
 

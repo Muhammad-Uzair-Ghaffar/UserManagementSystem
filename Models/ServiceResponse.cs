@@ -16,6 +16,6 @@ namespace UserManagementSystem.Models
 
         public Status Status  { get; set; } 
 
-        public string Message { get; set; } = null;
+        public string[] Message { get; set; } = null;
     }
 }

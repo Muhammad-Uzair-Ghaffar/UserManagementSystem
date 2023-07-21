@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace UserManagementSystem.Controllers
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes =("Bearer"))]
     [Route("api/v1/[controller]")]
     public class UserController : BaseController
     {
@@ -22,8 +22,9 @@ namespace UserManagementSystem.Controllers
             _userService = userService;
             _mapper = mapper;
         }
-
+        [Authorize( Roles ="Admin")]
         [HttpGet("GetAll")]
+
         public async Task<IActionResult> Get()
         {
             try
@@ -69,33 +70,6 @@ namespace UserManagementSystem.Controllers
 
         }
 
-        //[HttpPut("{id}")]
-        //public async Task<IActionResult> UpdateUser([FromBody] UserDto newUser, string id)
-        //{
-
-        //    if (!ModelState.IsValid)
-        //    {
-        //        List<string> errors = ModelState.Values.SelectMany((v) => v.Errors).Select(e => e.ErrorMessage).ToList();
-        //        return BadRequest(null, errors[0]);
-        //    }
-        //    else
-        //    {
-        //        try
-        //        {
-        //            IdentityUser user = _mapper.Map<IdentityUser>(newUser);
-        //            IdentityUser updateduser = await _userService.UpdateUser(id, user);
-        //            return Ok(updateduser, "User have been updated successfully");
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            return BadRequest(null, ex.Message);
-        //        }
-        //    }
-        //}
-
-        
-
-       
 
     }
 }

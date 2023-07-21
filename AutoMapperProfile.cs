@@ -18,6 +18,8 @@ namespace UserManagementSystem
             CreateMap<UserDto, IdentityUser>();
             CreateMap<IdentityUser, LoginDto>();
             CreateMap<LoginDto, IdentityUser>();
+            CreateMap<IdentityRole, RoleDto>();
+            CreateMap<RoleDto, IdentityRole>();
         }
     }
 }

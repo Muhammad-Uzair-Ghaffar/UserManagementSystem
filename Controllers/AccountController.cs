@@ -6,12 +6,13 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using NuGet.Protocol;
 using UserManagementSystem.Dtos.User;
 
 namespace UserManagementSystem.Controllers
 {
-    
-    [Route("[controller]")]
+
+    [Route("api/v1/[controller]")]
     public class AccountController : BaseController
     {
         private readonly UserManager<IdentityUser> _userManager;
@@ -28,7 +29,7 @@ namespace UserManagementSystem.Controllers
             _configuration = configuration;
             _mapper = mapper;
         }
-       
+        [AllowAnonymous]
         [HttpPost("Register")]
         public async Task<IActionResult> Register([FromBody] LoginDto model)
         {
@@ -36,6 +37,7 @@ namespace UserManagementSystem.Controllers
             {
                 if (ModelState.IsValid)
                 {
+
                     var user = new IdentityUser
                     {
                         UserName = model.UserName,
@@ -61,19 +63,12 @@ namespace UserManagementSystem.Controllers
             }
             catch (Exception ex)
             {
-                if (ex.InnerException == null)
-                {
-                    return BadRequest(ex.Message); 
-                }
-                else
-                {
-                    return BadRequest(ex.InnerException.Message);
-                }
+                return BadRequest(ex.Message); 
 
             }
         }
-        [HttpPost("Login")]
         [AllowAnonymous]
+        [HttpPost("Login")]
         public async Task<IActionResult> Login([FromBody] LoginDto authDto)
         {
             try
@@ -89,7 +84,8 @@ namespace UserManagementSystem.Controllers
 
                     if (result.Succeeded)
                     {
-                        var token = CreateJwtToken(user); 
+                        var roles = await _userManager.GetRolesAsync(user);
+                        var token = CreateJwtToken(user,roles); 
                         return Ok(new { Token = token });
                     }
                     return BadRequest(null,"Login failed");
@@ -106,7 +102,7 @@ namespace UserManagementSystem.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        private string CreateJwtToken(IdentityUser user)
+        private string CreateJwtToken(IdentityUser user, IList<string> roles)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_configuration.GetSection("JWT:Secret").Value); 
@@ -118,6 +114,7 @@ namespace UserManagementSystem.Controllers
                 {
                     new Claim(ClaimTypes.NameIdentifier, user.Id),
                     new Claim(ClaimTypes.Name, user.UserName),
+                    new Claim(ClaimTypes.Role, string.Join(",", roles)),
                 }),
                 Expires = DateTime.UtcNow.AddDays(2), 
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key)
