@@ -13,19 +13,22 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using UserManagementSystem.Dtos.User;
 using UserManagementSystem.Models;
-using UserManagementSystem.Models.AppDBContext;
+using UserManagementSystem.Context;
+using UserManagementSystem.GenericRepository;
 
 namespace UserManagementSystem.Services.UserService
 {
-    
+
     public class UserService : IUserService
     {
         private readonly IConfiguration _configuration;
+        private readonly IRepository<IdentityUser> _userRepository;
         private readonly AppDBContext _context;
-        public UserService(AppDBContext context, IConfiguration configuration)
+        public UserService(AppDBContext context, IConfiguration configuration, IRepository<IdentityUser> userRepository)
         {
             _context = context;
             _configuration = configuration;
+            _userRepository = userRepository;
         }
         //public async Task<List<IdentityUser>> AddUser(IdentityUser newUser)
         //{
@@ -42,21 +45,25 @@ namespace UserManagementSystem.Services.UserService
 
         public async Task<IdentityUser>  DeleteUser(string id)
         {
-            IdentityUser user = await _context.Users.FirstAsync(c=> c.Id == id);
-            _context.Users.Remove(user);
-            await _context.SaveChangesAsync();
+            IdentityUser user = await _userRepository.GetById(id);
+            if (user == null)
+            {
+                throw new Exception("User does not exist");
+            }
+            _userRepository.Delete(user);
+            await _userRepository.SaveChangesAsync();
             return user ;
         }
 
         public async Task<List<IdentityUser>>  GetAllUsers()
         {
-            List<IdentityUser> dbusers= await _context.Users.ToListAsync();
+            List<IdentityUser> dbusers= await _userRepository.GetAllAsync();
             return dbusers;
         }
 
         public async Task<IdentityUser> GetUserById(string id)
         {  
-            IdentityUser dbuser = await _context.Users.FirstAsync(c => c.Id == id);
+            IdentityUser dbuser = await _userRepository.GetById(id);
             return dbuser;
             
         }

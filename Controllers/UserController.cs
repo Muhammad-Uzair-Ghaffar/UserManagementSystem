@@ -22,7 +22,7 @@ namespace UserManagementSystem.Controllers
             _userService = userService;
             _mapper = mapper;
         }
-        [Authorize( Roles ="Admin")]
+      //  [Authorize( Roles ="Admin")]
         [HttpGet("GetAll")]
 
         public async Task<IActionResult> Get()

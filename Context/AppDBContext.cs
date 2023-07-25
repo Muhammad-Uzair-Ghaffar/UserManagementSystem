@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace UserManagementSystem.Models.AppDBContext
+namespace UserManagementSystem.Context
 {
     public class AppDBContext : IdentityDbContext
     {
