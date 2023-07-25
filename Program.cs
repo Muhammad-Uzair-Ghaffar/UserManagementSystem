@@ -6,6 +6,7 @@ using System.Text;
 using UserManagementSystem.Context;
 using UserManagementSystem.GenericRepository;
 using UserManagementSystem.Services;
+using UserManagementSystem.Services.AccountService;
 using UserManagementSystem.Services.UserService;
 
 
@@ -28,6 +29,7 @@ var smtpPassword = configuration.GetSection("AppSettings:SenderEmailPassword").V
 builder.Services.AddTransient<IEmailSender>(x => new EmailSender(smtpServer, smtpPort, smtpUsername, smtpPassword));
 builder.Services.AddControllers();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped( typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddAutoMapper(typeof(Program));
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

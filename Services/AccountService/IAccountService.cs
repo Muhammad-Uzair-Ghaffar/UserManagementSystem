@@ -6,11 +6,10 @@ namespace UserManagementSystem.Services.AccountService
     public interface IAccountService
     {
 
-        Task<IdentityUser> RegisterUser(LoginDto model);
-        Task<bool> ConfirmEmailAsync(string token);//will take user id from http context accessor here 
+        Task<IdentityUser> Register(IdentityUser user, string password);
+        Task<bool> ConfirmEmailAsync(string token);
        
         Task<string> Login(string email, string password);
-        Task<string> CreateJwtToken(IdentityUser user);
 
 
     }
