@@ -7,6 +7,7 @@ using UserManagementSystem.Context;
 using UserManagementSystem.GenericRepository;
 using UserManagementSystem.Services;
 using UserManagementSystem.Services.AccountService;
+using UserManagementSystem.Services.RoleService;
 using UserManagementSystem.Services.UserService;
 
 
@@ -30,6 +31,7 @@ builder.Services.AddTransient<IEmailSender>(x => new EmailSender(smtpServer, smt
 builder.Services.AddControllers();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
+builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped( typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddAutoMapper(typeof(Program));
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
