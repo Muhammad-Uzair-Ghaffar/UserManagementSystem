@@ -15,6 +15,8 @@ using UserManagementSystem.Dtos.User;
 using UserManagementSystem.Models;
 using UserManagementSystem.Context;
 using UserManagementSystem.GenericRepository;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using System.Reflection;
 
 namespace UserManagementSystem.Services.UserService
 {
@@ -30,18 +32,7 @@ namespace UserManagementSystem.Services.UserService
             _configuration = configuration;
             _userRepository = userRepository;
         }
-        //public async Task<List<IdentityUser>> AddUser(IdentityUser newUser)
-        //{
-        //    bool emailExists = await _context.Users.AnyAsync(c => c.Email == newUser.Email);
-        //    if (emailExists)
-        //    {
-        //        throw new Exception("Email already exists");
-        //    }
-        //    await _context.Users.AddAsync(newUser);
-        //    await _context.SaveChangesAsync();
-
-        //    return await _context.Users.ToListAsync();
-        //}
+     
 
         public async Task<IdentityUser>  DeleteUser(string id)
         {
@@ -67,17 +58,42 @@ namespace UserManagementSystem.Services.UserService
             return dbuser;
             
         }
+        public async Task<List<IdentityUser>> GetUsersWithPagination(int page, int pageSize, string search, string sortBy, string sortOrder)
+        {
+            var query = _userRepository.GetQueryable();
 
-      
-        //public async Task<User> UpdateUser(string id, User newUser)
-        //{
-        //    User user = users.First(c=> c.Id == id);
-        //    user.Name=newUser.Name;
-        //    user.Email=newUser.Email;
-        //    user.Age=newUser.Age;
-        //    return user; 
-        //}
+            // Apply search filter
+            if (!string.IsNullOrEmpty(search))
+            {
+                query = query.Where(u => u.UserName.StartsWith(search));
+            }
 
+            // Apply sorting
+            if (!string.IsNullOrEmpty(sortBy))
+            {
+                Type entityType = typeof(IdentityUser);
+
+                // Check if the property exists in the entity type
+                var propertyInfo = entityType.GetProperty(sortBy, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+                if (propertyInfo == null)
+                {
+                    throw new ArgumentException($"Sort by property '{sortBy}' is not a valid property for sorting");
+                }
+                switch (sortOrder.ToLower())
+                {
+                    case "asc":
+                        query = query.OrderBy(u => EF.Property<object>(u, sortBy));
+                        break;
+                    case "desc":
+                        query = query.OrderByDescending(u => EF.Property<object>(u, sortBy));
+                        break;
+                }
+            }
+
+            // Apply pagination
+            var users = await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+            return users;
+        }
 
     }
 }

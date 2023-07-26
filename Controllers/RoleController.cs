@@ -29,7 +29,7 @@ namespace UserManagementSystem.Controllers
             try
             {
                 await _roleService.DeleteUserRole(userrole.UserId,userrole.RoleId);
-                return Ok(null, "Role with given Id have been deleted");
+                return Ok(null, "UserRole with given Id have been deleted");
             }
             catch (Exception ex)
             {

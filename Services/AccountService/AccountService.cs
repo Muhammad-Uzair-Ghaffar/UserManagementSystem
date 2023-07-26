@@ -3,6 +3,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace UserManagementSystem.Services.AccountService
 {
@@ -102,6 +103,11 @@ namespace UserManagementSystem.Services.AccountService
 
         public async Task<IdentityUser> Register(IdentityUser user,string  password)
         {
+            string passwordPattern = @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$";
+            if (!Regex.IsMatch(password, passwordPattern))
+            {
+                throw new Exception("Invalid password pattern. Password must be at least 8 characters long and contain special characters.");
+            }
             var result = await _userManager.CreateAsync(user, password);
 
             if (result.Succeeded)
@@ -114,9 +120,10 @@ namespace UserManagementSystem.Services.AccountService
                 await _emailSender.SendEmailAsync(user.Email, "Confirm your email", $"Please confirm your account by clicking this link: {confirmationLink}");
                 return user;
             }
-            var errorDescriptions = result.Errors.Select(error => error.Description).ToList();
-            
-            throw new Exception(errorDescriptions.ToString());//can use a custom exception that will send list 
+            var errorDescriptions = string.Join(Environment.NewLine, result.Errors.Select(error => error.Description));
+
+
+            throw new Exception("Email or username Duplicate");//can use a custom exception that will send list or this error descriptions which is a list of errors combined together 
            
         }
     }

@@ -37,6 +37,8 @@ namespace UserManagementSystem.Controllers
                 return BadRequest(null, ex.Message);
             }
         }
+        
+
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetSingle(string id)
@@ -70,6 +72,20 @@ namespace UserManagementSystem.Controllers
 
         }
 
+        [AllowAnonymous]
+        [HttpGet("GetAllPagination")]
+        public async Task<IActionResult> Get([FromQuery] int page = 1, [FromQuery] int pageSize = 10, [FromQuery] string search = "", [FromQuery] string sortBy = "", [FromQuery] string sortOrder = "")
+        {
+            try
+            {
+                var users = await _userService.GetUsersWithPagination(page, pageSize, search, sortBy, sortOrder);
+                return Ok((users.Select(c => _mapper.Map<UserDto>(c)).ToList()), "This is the list of all users");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(null, ex.Message);
+            }
+        }
 
     }
 }
