@@ -5,16 +5,17 @@ using System.Collections.Generic;
 using UserManagementSystem.Services.UserService;
 using UserManagementSystem.Dtos.User;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 
 namespace UserManagementSystem.Controllers
 {
-   
-    [Route("[controller]")]
-    public class UserController: ControllerBase
+    [Authorize]
+    [Route("api/v1/[controller]")]
+    public class UserController : BaseController
     {
-        
+
         private readonly IUserService _userService;
-       private readonly IMapper _mapper;
+        private readonly IMapper _mapper;
         public UserController(IUserService userService, IMapper mapper)
         {
             _userService = userService;
@@ -22,92 +23,83 @@ namespace UserManagementSystem.Controllers
         }
 
         [HttpGet("GetAll")]
-        public async Task<IActionResult>  Get()
+        public async Task<IActionResult> Get()
         {
-            ServiceResponse<List<GetUserDto>> serviceResponse = new ServiceResponse<List<GetUserDto>>();
-            List<User> users=await _userService.GetAllUsers();
-            serviceResponse.Data= (users.Select(c=> _mapper.Map<GetUserDto>(c)).ToList());
-            return Ok(serviceResponse);
+            try
+            {
+                List<User> users = await _userService.GetAllUsers();
+                return Ok((users.Select(c => _mapper.Map<UserDto>(c)).ToList()), "This is the list of all users");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(null, ex.Message);
+            }
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult>  GetSingle(Guid id)
+        public async Task<IActionResult> GetSingle(string id)
         {
-            ServiceResponse<GetUserDto> serviceResponse = new ServiceResponse<GetUserDto>();
-            User user = await _userService.GetUserById(id);
-            serviceResponse.Data = _mapper.Map<GetUserDto>(user);
-            return Ok(serviceResponse);
+            try
+            {
+                User user = await _userService.GetUserById(id);
+                return Ok(_mapper.Map<UserDto>(user), "This is the user with given ID");
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(null, ex.Message);
+            }
+
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteUser(Guid id)
+        public async Task<IActionResult> DeleteUser(string id)
         {
-            ServiceResponse<List<GetUserDto>> serviceResponse = new ServiceResponse<List<GetUserDto>>();
-            if (!ModelState.IsValid)
-            {
-                List<string> errors = ModelState.Values.SelectMany((v) => v.Errors).Select(e => e.ErrorMessage).ToList();
-                serviceResponse.Message = errors[0];
-                serviceResponse.status = Status.BadRequest;
-                return BadRequest(serviceResponse);
 
-            }
-            else
+            try
             {
-                try
-                {
-                    List<User> users = await _userService.DeleteUser(id);
-                    serviceResponse.Data = (users.Select(c => _mapper.Map<GetUserDto>(c)).ToList());
-                    return Ok(serviceResponse);
-                }
-                catch (Exception ex)
-                {
-                    serviceResponse.Message = ex.Message;
-                    serviceResponse.status = Status.BadRequest;
-                    return BadRequest(serviceResponse);
-                }
+                await _userService.DeleteUser(id);
+                return Ok(null, "User with given Id have been deleted");
             }
-         
+            catch (Exception ex)
+            {
+                return BadRequest(null, ex.Message);
+            }
+
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult>  UpdateUser([FromBody]  AddUserDto newUser,Guid id)
+        public async Task<IActionResult> UpdateUser([FromBody] UserDto newUser, string id)
         {
-            ServiceResponse<List<GetUserDto>> serviceResponse = new ServiceResponse<List<GetUserDto>>();
+
             if (!ModelState.IsValid)
             {
-                List<string> errors = ModelState.Values.SelectMany((v)=> v.Errors).Select(e => e.ErrorMessage).ToList();
-                serviceResponse.Message = errors[0];
-                serviceResponse.status = Status.BadRequest;
-                return BadRequest(serviceResponse);
-
+                List<string> errors = ModelState.Values.SelectMany((v) => v.Errors).Select(e => e.ErrorMessage).ToList();
+                return BadRequest(null, errors[0]);
             }
             else
             {
                 try
                 {
                     User user = _mapper.Map<User>(newUser);
-                    List<User> users = await _userService.UpdateUser(id, user);
-                    serviceResponse.Data = (users.Select(c => _mapper.Map<GetUserDto>(c)).ToList());
-                    return Ok(serviceResponse);
+                    User updateduser = await _userService.UpdateUser(id, user);
+                    return Ok(updateduser, "User have been updated successfully");
                 }
-                catch ( Exception ex)
+                catch (Exception ex)
                 {
-                    serviceResponse.Message = ex.Message;
-                    serviceResponse.status = Status.BadRequest;
-                    return BadRequest(serviceResponse);
+                    return BadRequest(null, ex.Message);
                 }
             }
         }
 
         [HttpPost]
-        public async Task<IActionResult>  AddUser([FromBody] AddUserDto newUser)
+        public async Task<IActionResult> AddUser([FromBody] UserDto newUser)
         {
-            ServiceResponse<List<GetUserDto>> serviceResponse = new ServiceResponse<List<GetUserDto>>();
+
             if (!ModelState.IsValid)
             {
-                serviceResponse.Message = "Insufficient credentials to proceed with request ";
-                serviceResponse.status = Status.BadRequest;
-                return BadRequest(serviceResponse);
+                List<string> errors = ModelState.Values.SelectMany((v) => v.Errors).Select(e => e.ErrorMessage).ToList();
+                return BadRequest(null, errors[0]);
 
             }
             else
@@ -115,19 +107,52 @@ namespace UserManagementSystem.Controllers
                 try
                 {
                     User user = _mapper.Map<User>(newUser);
+                    user.Id = Guid.NewGuid().ToString();
                     List<User> users = await _userService.AddUser(user);
-                    serviceResponse.Data = (users.Select(c => _mapper.Map<GetUserDto>(c)).ToList());
-                    return Ok(serviceResponse);
+                    return Ok((users.Select(c => _mapper.Map<UserDto>(c)).ToList()), "A new user have been added successfully");
 
                 }
                 catch (Exception ex)
                 {
-                    serviceResponse.Message = ex.Message;
-                    serviceResponse.status = Status.BadRequest;
-                    return BadRequest(serviceResponse);
+                    return BadRequest(null, ex.Message);
                 }
-                
+
             }
         }
+
+        [AllowAnonymous]
+        [HttpPost("Register")]
+        public async Task<IActionResult> Register([FromBody] UserDto newUser)
+        {
+            try
+            {
+                User user = _mapper.Map<User>(newUser);
+                user.Id = Guid.NewGuid().ToString();
+                User dbuser = await _userService.Register(user,newUser.Password);
+                return Ok(_mapper.Map<UserDto>(dbuser), "A new user have been added successfully");
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(null, ex.Message);
+            }
+        }
+        [AllowAnonymous]
+        [HttpPost("Login")]
+        public async Task<IActionResult> Login([FromBody] LoginDto newUser)
+        {
+            try
+            {
+                
+                return Ok(await _userService.Login(newUser.Email, newUser.Password), "User logged in  successfully");
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(null, ex.Message);
+            }
+
+        }
+
     }
 }

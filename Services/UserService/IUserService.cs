@@ -10,9 +10,12 @@ namespace UserManagementSystem.Services.UserService
     public interface IUserService
     {
         Task<List<User>> GetAllUsers();
-         Task<User> GetUserById(Guid id);
+         Task<User> GetUserById(string id);
          Task<List<User>> AddUser(User newUser);
-         Task<List<User>> DeleteUser(Guid id);
-         Task<List<User>> UpdateUser(Guid id,User newUser);
+         Task<User> DeleteUser(string id);
+         Task<User> UpdateUser(string id,User newUser);
+        Task<User>  Register(User newUser, string password);
+        Task<string> Login(string useremail, string password);
+        Task<bool> UserExists(string useremail);
     }
 }

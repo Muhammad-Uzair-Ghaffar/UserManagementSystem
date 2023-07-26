@@ -7,15 +7,14 @@ namespace UserManagementSystem.Models
 {   
     public enum Status
     {
-        Success= 200,
-        BadRequest = 400,
-        IncorrectUrl= 404
+        Success= 1,
+        Failed = 0,
     }
-    public class ServiceResponse<T>
+    public class ServiceResponse
     {
-        public T Data { get; set; }
+        public object Data { get; set; }
 
-        public Status status  { get; set; } = Status.Success;
+        public Status Status  { get; set; } 
 
         public string Message { get; set; } = null;
     }
