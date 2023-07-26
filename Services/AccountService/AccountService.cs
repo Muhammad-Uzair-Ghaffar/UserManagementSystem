@@ -39,12 +39,16 @@ namespace UserManagementSystem.Services.AccountService
             var jwtToken = (JwtSecurityToken)validatedToken;
             var userId = jwtToken.Claims.FirstOrDefault(x => x.Type == "nameid")?.Value;
 
+
             if (userId != null)
             {
                 var user = await _userManager.FindByIdAsync(userId);
-
                 if (user != null)
                 {
+                    if (user.EmailConfirmed == true)
+                    {
+                        throw new Exception("Email Already confirmed ");
+                    }
                     user.EmailConfirmed = true;
                     await _userManager.UpdateAsync(user);
 
