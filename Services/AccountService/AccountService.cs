@@ -88,10 +88,15 @@ namespace UserManagementSystem.Services.AccountService
 
         public async Task<string> Login(string email, string password)
         {
+
             var user = await _userManager.FindByEmailAsync(email);
             if (user == null)
             {
                 throw new ArgumentException("User not found.");
+            }
+            if (!user.EmailConfirmed)
+            {
+                throw new ArgumentException("Please confirm you email first ");
             }
 
             var result = await _signInManager.PasswordSignInAsync(user.UserName, password, false, false);

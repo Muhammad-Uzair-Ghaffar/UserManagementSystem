@@ -59,43 +59,7 @@ namespace UserManagementSystem.Controllers
                 
                 return BadRequest(ex.Message);
             }
-            //        if (ModelState.IsValid)
-            //    {
-
-            //        var user = new IdentityUser
-            //        {
-            //            UserName = model.UserName,
-            //            Email = model.Email,
-            //        };
-            //        var result = await _userManager.CreateAsync(user, model.Password);
-
-            //        if (result.Succeeded)
-            //        {
-            //            var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-            //            var jwtToken = CreateJwtToken(user);
-            //            var baseUrl = _configuration.GetSection("AppSettings:BaseUrl").Value;
-
-            //            var confirmationLink = baseUrl + "/" + "Account" + "/" + "ConfirmEmail/" + jwtToken;
-            //            await _emailSender.SendEmailAsync(user.Email, "Confirm your email", $"Please confirm your account by clicking this link: {confirmationLink}");
-            //            UserDto userDto = _mapper.Map<UserDto>(user);
-            //            return Ok(userDto);
-
-            //        }
-            //        var errorDescriptions = result.Errors.Select(error => error.Description).ToList();
-            //        return BadRequest(errorDescriptions); 
-
-            //    }
-            //    else
-            //    {
-            //        List<string> errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
-            //        return BadRequest(errors);
-            //    }
-            //}
-            //catch (Exception ex)
-            //{
-            //    return BadRequest(ex.Message); 
-
-            //}
+            
         }
         [AllowAnonymous]
         [HttpPost("Login")]
@@ -126,7 +90,7 @@ namespace UserManagementSystem.Controllers
                 var isConfirmed = await _accountService.ConfirmEmailAsync(token);
                 if (isConfirmed)
                 {
-                    return Ok("Email confirmed successfully.");
+                    return Ok(null,"Email confirmed successfully.");
                 }
                 return BadRequest("Invalid token or user not found.");
             }
