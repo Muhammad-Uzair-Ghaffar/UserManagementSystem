@@ -4,6 +4,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using System.Text.RegularExpressions;
+using UserManagementSystem.Services.EmailService;
 
 namespace UserManagementSystem.Services.AccountService
 {
@@ -13,14 +14,14 @@ namespace UserManagementSystem.Services.AccountService
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly IConfiguration _configuration;
-        private readonly IEmailSender _emailSender;
+        private readonly IEmailService _emailService;
 
-        public AccountService(UserManager<IdentityUser> userManager,SignInManager<IdentityUser> signInManager, IEmailSender emailSender, IConfiguration configuration)
+        public AccountService(UserManager<IdentityUser> userManager,SignInManager<IdentityUser> signInManager, IEmailService emailService, IConfiguration configuration)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _configuration = configuration;
-            _emailSender = emailSender;
+            _emailService = emailService;
         }
 
         public async Task<bool> ConfirmEmailAsync(string token)
@@ -126,7 +127,8 @@ namespace UserManagementSystem.Services.AccountService
                 var baseUrl = _configuration.GetSection("AppSettings:BaseUrl").Value;
 
                 var confirmationLink = baseUrl + "/" + "Account" + "/" + "ConfirmEmail/" + jwtToken;
-                await _emailSender.SendEmailAsync(user.Email, "Confirm your email", $"Please confirm your account by clicking this link: {confirmationLink}");
+                string emailBody = $@"Please confirm your account by clicking this link: <a href='{confirmationLink}'>Confirm email</a>";
+                await _emailService.SendEmailAsync(user.Email, "Confirm your email", emailBody);
                 return user;
             }
             var errorDescriptions = string.Join(Environment.NewLine, result.Errors.Select(error => error.Description));

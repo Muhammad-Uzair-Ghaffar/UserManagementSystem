@@ -2,16 +2,16 @@
 using System.Net.Mail;
 using System.Threading.Tasks;
 
-namespace UserManagementSystem.Services
+namespace UserManagementSystem.Services.EmailService
 {
-    public class EmailSender : IEmailSender
+    public class EmailService : IEmailService
     {
         private readonly string _smtpServer;
         private readonly int _smtpPort;
         private readonly string _smtpUsername;
         private readonly string _smtpPassword;
 
-        public EmailSender(string smtpServer, int smtpPort, string smtpUsername, string smtpPassword)
+        public EmailService(string smtpServer, int smtpPort, string smtpUsername, string smtpPassword)
         {
             _smtpServer = smtpServer;
             _smtpPort = smtpPort;

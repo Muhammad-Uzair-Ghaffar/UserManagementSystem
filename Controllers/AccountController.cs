@@ -8,8 +8,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using NuGet.Protocol;
 using UserManagementSystem.Dtos.User;
-using UserManagementSystem.Services;
 using UserManagementSystem.Services.AccountService;
+using UserManagementSystem.Services.EmailService;
 
 namespace UserManagementSystem.Controllers
 {
@@ -21,13 +21,13 @@ namespace UserManagementSystem.Controllers
         private readonly SignInManager<IdentityUser> _signInManager; 
         private readonly IConfiguration _configuration;
         private readonly IMapper _mapper;
-        private readonly IEmailSender _emailSender;
+        private readonly IEmailService _emailSender;
         private readonly IAccountService _accountService;
 
        
 
         public AccountController(UserManager<IdentityUser> userManager,
-                              SignInManager<IdentityUser> signInManager, IConfiguration configuration, IMapper mapper, IEmailSender emailSender, IAccountService accountService)
+                              SignInManager<IdentityUser> signInManager, IConfiguration configuration, IMapper mapper, IEmailService emailSender, IAccountService accountService)
         {
             _userManager = userManager;
             _signInManager = signInManager;

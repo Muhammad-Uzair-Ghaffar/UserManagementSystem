@@ -57,42 +57,12 @@ namespace UserManagementSystem.Services.UserService
             IdentityUser dbuser = await _userRepository.GetById(id);
             return dbuser;
             
-        }
-        public async Task<List<IdentityUser>> GetUsersWithPagination(int page, int pageSize, string search, string sortBy, string sortOrder)
+        } 
+        public async Task<List<IdentityUser>> GetUsersWithPagination(int page, int pageSize, string filter, string searchBy, string sortBy, bool ascending)
         {
-            var query = _userRepository.GetQueryable();
 
-            // Apply search filter
-            if (!string.IsNullOrEmpty(search))
-            {
-                query = query.Where(u => u.UserName.StartsWith(search));
-            }
-
-            // Apply sorting
-            if (!string.IsNullOrEmpty(sortBy))
-            {
-                Type entityType = typeof(IdentityUser);
-
-                // Check if the property exists in the entity type
-                var propertyInfo = entityType.GetProperty(sortBy, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
-                if (propertyInfo == null)
-                {
-                    throw new ArgumentException($"Sort by property '{sortBy}' is not a valid property for sorting");
-                }
-                switch (sortOrder.ToLower())
-                {
-                    case "asc":
-                        query = query.OrderBy(u => EF.Property<object>(u, sortBy));
-                        break;
-                    case "desc":
-                        query = query.OrderByDescending(u => EF.Property<object>(u, sortBy));
-                        break;
-                }
-            }
-
-            // Apply pagination
-            var users = await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
-            return users;
+            return (await _userRepository.GetAllpagedAsync(page, pageSize, filter, searchBy, sortBy, ascending)).ToList();
+            
         }
 
     }

@@ -26,16 +26,15 @@ namespace UserManagementSystem.Services.RoleService
         }
 
         public async Task<List<IdentityRole>> AddRole(IdentityRole newRole, string userId)
-        {
-           
-           
-           // await IsAdmin(_userId);
+        {// await IsAdmin(_userId);
+
             if (newRole.Name == "")
             {
                 throw new Exception("Role Name cannot be empty");
             }
-            bool roleExists = _roleRepository.GetQueryable().Any(c => c.Name == newRole.Name);
-            if (roleExists)
+            IQueryable< IdentityRole> roles = await _roleRepository.Query(c => c.Name == newRole.Name);
+            var  roleExist= roles.Any();
+            if (roleExist)
             {
                 throw new Exception("Role already exists");
             }
@@ -49,9 +48,10 @@ namespace UserManagementSystem.Services.RoleService
        
 
         public async Task<IdentityUserRole<string>> AddUserRole(IdentityUserRole<string> newUserrole)
-        {
-           // await IsAdmin(_userId);
-            bool relationExists = await _userRoleRepository.GetQueryable().AnyAsync(c => c.UserId == newUserrole.UserId && c.RoleId == newUserrole.RoleId);
+        {// await IsAdmin(_userId);
+
+            IQueryable < IdentityUserRole<string> > rolerelations = await _userRoleRepository.Query(c => c.UserId == newUserrole.UserId && c.RoleId == newUserrole.RoleId);
+            var relationExists = rolerelations.Any();
             if (relationExists)
             {
                 throw new Exception("Relation of user with provided role already exists");
@@ -62,9 +62,9 @@ namespace UserManagementSystem.Services.RoleService
         }
 
         public async Task DeleteRole(string id)
-        {
+        {// await IsAdmin(_userId);
 
-            // await IsAdmin(_userId);
+
             IdentityRole role = await _roleRepository.GetById(id);
             if (role == null)
             {
@@ -78,7 +78,8 @@ namespace UserManagementSystem.Services.RoleService
         public async Task DeleteUserRole(string userId, string roleId)
         {
             //await IsAdmin(_userId);
-            IdentityUserRole<string> userRole = await _userRoleRepository.GetQueryable().FirstAsync(c => c.UserId == userId && c.RoleId == roleId);
+            IQueryable<IdentityUserRole<string>> userRoles = await _userRoleRepository.Query(c => c.UserId == userId && c.RoleId == roleId);
+            var userRole = userRoles.First();
             _userRoleRepository.Delete(userRole);
             await _userRoleRepository.SaveChangesAsync();
         }
@@ -99,12 +100,14 @@ namespace UserManagementSystem.Services.RoleService
 
         public async Task IsAdmin(string userId)
         {
-            IdentityRole adminRole = await _roleRepository.GetQueryable().FirstOrDefaultAsync(c => c.Name == "Admin");
+            IQueryable<IdentityRole>adminRoles = await _roleRepository.Query(c => c.Name == "Admin");
+            var adminRole = adminRoles.FirstOrDefault();
 
             if (adminRole != null)
             {
                 string adminRoleId = adminRole.Id;
-                bool isAdmin = _roleRepository.GetQueryable().Any(c => c.Id == userId && c.Name == adminRoleId);
+                IQueryable<IdentityRole> admins = await _roleRepository.Query(c => c.Id == userId && c.Name == adminRoleId);
+                var isAdmin = admins.Any();
                 if (!isAdmin)
                 {
                     throw new Exception("User is unauthorized");

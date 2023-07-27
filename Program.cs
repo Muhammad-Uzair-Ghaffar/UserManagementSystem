@@ -5,8 +5,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using UserManagementSystem.Context;
 using UserManagementSystem.GenericRepository;
-using UserManagementSystem.Services;
 using UserManagementSystem.Services.AccountService;
+using UserManagementSystem.Services.EmailService;
 using UserManagementSystem.Services.RoleService;
 using UserManagementSystem.Services.UserService;
 
@@ -27,7 +27,7 @@ var smtpPort = int.Parse(configuration.GetSection("AppSettings:SmtpPort").Value)
 var smtpUsername = configuration.GetSection("AppSettings:SenderEmail").Value;
 var smtpPassword = configuration.GetSection("AppSettings:SenderEmailPassword").Value;
 
-builder.Services.AddTransient<IEmailSender>(x => new EmailSender(smtpServer, smtpPort, smtpUsername, smtpPassword));
+builder.Services.AddTransient<IEmailService>(x => new EmailService(smtpServer, smtpPort, smtpUsername, smtpPassword));
 builder.Services.AddControllers();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
