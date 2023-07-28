@@ -6,10 +6,11 @@ using UserManagementSystem.Services.UserService;
 using UserManagementSystem.Dtos.User;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 
 namespace UserManagementSystem.Controllers
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes =("Bearer"))]
     [Route("api/v1/[controller]")]
     public class UserController : BaseController
     {
@@ -21,13 +22,14 @@ namespace UserManagementSystem.Controllers
             _userService = userService;
             _mapper = mapper;
         }
-
+      //  [Authorize( Roles ="Admin")]
         [HttpGet("GetAll")]
+
         public async Task<IActionResult> Get()
         {
             try
             {
-                List<User> users = await _userService.GetAllUsers();
+                List<IdentityUser> users = await _userService.GetAllUsers();
                 return Ok((users.Select(c => _mapper.Map<UserDto>(c)).ToList()), "This is the list of all users");
             }
             catch (Exception ex)
@@ -35,13 +37,15 @@ namespace UserManagementSystem.Controllers
                 return BadRequest(null, ex.Message);
             }
         }
+        
+
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetSingle(string id)
         {
             try
             {
-                User user = await _userService.GetUserById(id);
+                IdentityUser user = await _userService.GetUserById(id);
                 return Ok(_mapper.Map<UserDto>(user), "This is the user with given ID");
 
             }
@@ -68,90 +72,19 @@ namespace UserManagementSystem.Controllers
 
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateUser([FromBody] UserDto newUser, string id)
-        {
-
-            if (!ModelState.IsValid)
-            {
-                List<string> errors = ModelState.Values.SelectMany((v) => v.Errors).Select(e => e.ErrorMessage).ToList();
-                return BadRequest(null, errors[0]);
-            }
-            else
-            {
-                try
-                {
-                    User user = _mapper.Map<User>(newUser);
-                    User updateduser = await _userService.UpdateUser(id, user);
-                    return Ok(updateduser, "User have been updated successfully");
-                }
-                catch (Exception ex)
-                {
-                    return BadRequest(null, ex.Message);
-                }
-            }
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> AddUser([FromBody] UserDto newUser)
-        {
-
-            if (!ModelState.IsValid)
-            {
-                List<string> errors = ModelState.Values.SelectMany((v) => v.Errors).Select(e => e.ErrorMessage).ToList();
-                return BadRequest(null, errors[0]);
-
-            }
-            else
-            {
-                try
-                {
-                    User user = _mapper.Map<User>(newUser);
-                    user.Id = Guid.NewGuid().ToString();
-                    List<User> users = await _userService.AddUser(user);
-                    return Ok((users.Select(c => _mapper.Map<UserDto>(c)).ToList()), "A new user have been added successfully");
-
-                }
-                catch (Exception ex)
-                {
-                    return BadRequest(null, ex.Message);
-                }
-
-            }
-        }
-
         [AllowAnonymous]
-        [HttpPost("Register")]
-        public async Task<IActionResult> Register([FromBody] UserDto newUser)
+        [HttpGet("GetAllPagination")]
+        public async Task<IActionResult> Get([FromQuery] int page = 1, [FromQuery] int pageSize = 10, [FromQuery] string searchBy = "", [FromQuery] string sortBy = "")
         {
             try
             {
-                User user = _mapper.Map<User>(newUser);
-                user.Id = Guid.NewGuid().ToString();
-                User dbuser = await _userService.Register(user,newUser.Password);
-                return Ok(_mapper.Map<UserDto>(dbuser), "A new user have been added successfully");
-
+                var users = await _userService.GetUsersWithPagination(page, pageSize, searchBy, sortBy);
+                return Ok((users.Select(c => _mapper.Map<UserDto>(c)).ToList()), "This is the list of all users");
             }
             catch (Exception ex)
             {
                 return BadRequest(null, ex.Message);
             }
-        }
-        [AllowAnonymous]
-        [HttpPost("Login")]
-        public async Task<IActionResult> Login([FromBody] LoginDto newUser)
-        {
-            try
-            {
-                
-                return Ok(await _userService.Login(newUser.Email, newUser.Password), "User logged in  successfully");
-
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(null, ex.Message);
-            }
-
         }
 
     }

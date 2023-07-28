@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using UserManagementSystem.Dtos.Role;
@@ -28,7 +29,7 @@ namespace UserManagementSystem.Controllers
             try
             {
                 await _roleService.DeleteUserRole(userrole.UserId,userrole.RoleId);
-                return Ok(null, "Role with given Id have been deleted");
+                return Ok(null, "UserRole with given Id have been deleted");
             }
             catch (Exception ex)
             {
@@ -69,9 +70,8 @@ namespace UserManagementSystem.Controllers
             {
                 try
                 {
-                    UserRole userrole = _mapper.Map<UserRole>(newUserRole);
-                    userrole.Id = Guid.NewGuid().ToString();
-                    UserRole newuserrole = await _roleService.AddUserRole(userrole);
+                    IdentityUserRole<string> userrole = _mapper.Map<IdentityUserRole<string>>(newUserRole);
+                    IdentityUserRole<string> newuserrole = await _roleService.AddUserRole(userrole);
                     return Ok(newuserrole, "A new role realation have been added successfully");
 
                 }
@@ -82,7 +82,6 @@ namespace UserManagementSystem.Controllers
 
             }
         }
-        [Authorize]
         [HttpPost("AddRole")]
         public async Task<IActionResult> AddRole([FromBody] RoleDto newRole)
         {
@@ -99,9 +98,9 @@ namespace UserManagementSystem.Controllers
                 {
                     var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-                    Role role = _mapper.Map<Role>(newRole);
+                    IdentityRole role = _mapper.Map<IdentityRole>(newRole);
                     role.Id = Guid.NewGuid().ToString();
-                    List<Role> users = await _roleService.AddRole(role,userId);
+                    List<IdentityRole> users = await _roleService.AddRole(role,userId);
                     return Ok((users.Select(c => _mapper.Map<RoleDto>(c)).ToList()), "A new role have been added successfully");
 
                 }
@@ -117,7 +116,7 @@ namespace UserManagementSystem.Controllers
         {
             try
             {
-                List<UserRole> userroles = await _roleService.GetAllUserRoles();
+                List<IdentityUserRole<string>> userroles = await _roleService.GetAllUserRoles();
                 return Ok((userroles.Select(c => _mapper.Map<UserRoleDto>(c)).ToList()), "This is the list of all relations");
             }
             catch (Exception ex)
@@ -130,7 +129,7 @@ namespace UserManagementSystem.Controllers
         {
             try
             {
-                List<Role> roles = await _roleService.GetAllRoles();
+                List<IdentityRole> roles = await _roleService.GetAllRoles();
                 return Ok((roles.Select(c => _mapper.Map<RoleDto>(c)).ToList()), "This is the list of all roles");
             }
             catch (Exception ex)

@@ -1,8 +1,9 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
 using System.Security.Claims;
-using UserManagementSystem.Data;
+using UserManagementSystem.GenericRepository;
 using UserManagementSystem.Models;
 
 namespace UserManagementSystem.Services.RoleService
@@ -10,89 +11,103 @@ namespace UserManagementSystem.Services.RoleService
     public class RoleService : IRoleService
     {
 
-        private readonly DataContext _context;
+
+        private readonly IRepository<IdentityRole> _roleRepository;
+        private readonly IRepository<IdentityUserRole<string>> _userRoleRepository;
         private readonly string _userId;
-        public RoleService(DataContext context, IHttpContextAccessor httpContextAccessor)
+        public RoleService(IRepository<IdentityRole> roleRepository, IRepository<IdentityUserRole<string>> userRoleRepository, IHttpContextAccessor httpContextAccessor)
         {
-            _context = context;
+           
             _userId = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            _roleRepository = roleRepository;
+
+            _userRoleRepository = userRoleRepository;
         }
 
-        public async Task<List<Role>> AddRole(Role newRole, string userId)
-        {
-           
-           
-            await IsAdmin(_userId);
+        public async Task<List<IdentityRole>> AddRole(IdentityRole newRole, string userId)
+        {// await IsAdmin(_userId);
+
             if (newRole.Name == "")
             {
                 throw new Exception("Role Name cannot be empty");
             }
-            bool roleExists = _context.Roles.Any(c => c.Name == newRole.Name);
-            if (roleExists)
+            IQueryable< IdentityRole> roles = await _roleRepository.Query(c => c.Name == newRole.Name);
+            var  roleExist= roles.Any();
+            if (roleExist)
             {
                 throw new Exception("Role already exists");
             }
-            await _context.Roles.AddAsync(newRole);
-            await _context.SaveChangesAsync();
+            _roleRepository.Insert(newRole);
+            await _roleRepository.SaveChangesAsync();
 
-            return await _context.Roles.ToListAsync();
+            return await _roleRepository.GetAllAsync();
         }
 
 
        
 
-        public async Task<UserRole> AddUserRole(UserRole newUserrole)
-        {
-            await IsAdmin(_userId);
-            bool relationExists = await _context.UserRoles.AnyAsync(c => c.UserId == newUserrole.UserId && c.RoleId == newUserrole.RoleId);
+        public async Task<IdentityUserRole<string>> AddUserRole(IdentityUserRole<string> newUserrole)
+        {// await IsAdmin(_userId);
+
+            IQueryable < IdentityUserRole<string> > rolerelations = await _userRoleRepository.Query(c => c.UserId == newUserrole.UserId && c.RoleId == newUserrole.RoleId);
+            var relationExists = rolerelations.Any();
             if (relationExists)
             {
                 throw new Exception("Relation of user with provided role already exists");
             }
-             await _context.UserRoles.AddAsync(newUserrole);
-            await _context.SaveChangesAsync();
-            UserRole relation = await _context.UserRoles.FirstAsync(c => c.UserId == newUserrole.UserId);
-            return relation;
+            _userRoleRepository.Insert( newUserrole);
+            await _userRoleRepository.SaveChangesAsync();
+            return newUserrole;
         }
 
         public async Task DeleteRole(string id)
-        {
-            await IsAdmin(_userId);
-            Role role = await _context.Roles.FirstAsync(c => c.Id == id);
-            _context.Roles.Remove(role);
-            await _context.SaveChangesAsync();
+        {// await IsAdmin(_userId);
+
+
+            IdentityRole role = await _roleRepository.GetById(id);
+            if (role == null)
+            {
+                throw new Exception("User does not exist");
+            }
+            _roleRepository.Delete(role);
+            await _roleRepository.SaveChangesAsync();
+            
         }
 
         public async Task DeleteUserRole(string userId, string roleId)
         {
-            await IsAdmin(_userId);
-            UserRole userrole = await _context.UserRoles.FirstAsync(c => c.UserId == userId && c.RoleId == roleId);
-            _context.UserRoles.Remove(userrole);
-            await _context.SaveChangesAsync();
+            //await IsAdmin(_userId);
+            IQueryable<IdentityUserRole<string>> userRoles = await _userRoleRepository.Query(c => c.UserId == userId && c.RoleId == roleId);
+            var userRole = userRoles.First();
+            _userRoleRepository.Delete(userRole);
+            await _userRoleRepository.SaveChangesAsync();
         }
 
-        public async Task<List<UserRole>> GetAllUserRoles()
+        public async Task<List<IdentityUserRole<string>>> GetAllUserRoles()
         {
-            await IsAdmin(_userId);
-            List<UserRole> userroles = await _context.UserRoles.ToListAsync();
+           // await IsAdmin(_userId);
+            List< IdentityUserRole<string> > userroles = await _userRoleRepository.GetAllAsync(); 
             return userroles;
         }
 
-        public async Task<List<Role>> GetAllRoles()
+        public async Task<List<IdentityRole>> GetAllRoles()
         {
-            await IsAdmin(_userId);
-            List<Role> roles = await _context.Roles.ToListAsync();
+            //await IsAdmin(_userId);
+            List<IdentityRole> roles = await _roleRepository.GetAllAsync();
             return roles;
         }
 
         public async Task IsAdmin(string userId)
         {
-            Role adminRole = await _context.Roles.FirstOrDefaultAsync(c => c.Name == "Admin");
+            IQueryable<IdentityRole>adminRoles = await _roleRepository.Query(c => c.Name == "Admin");
+            var adminRole = adminRoles.FirstOrDefault();
 
             if (adminRole != null)
             {
                 string adminRoleId = adminRole.Id;
-                bool isAdmin = _context.UserRoles.Any(c => c.UserId == userId && c.RoleId == adminRoleId);
+                IQueryable<IdentityRole> admins = await _roleRepository.Query(c => c.Id == userId && c.Name == adminRoleId);
+                var isAdmin = admins.Any();
                 if (!isAdmin)
                 {
                     throw new Exception("User is unauthorized");

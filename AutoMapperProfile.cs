@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.AspNetCore.Identity;
 using UserManagementSystem.Dtos.Role;
 using UserManagementSystem.Dtos.User;
 using UserManagementSystem.Models;
@@ -13,14 +14,14 @@ namespace UserManagementSystem
     {
         public AutoMapperProfile()
         {
-            CreateMap<User,UserDto>();
-            CreateMap<UserDto,User>();
-            CreateMap<User, LoginDto>();
-            CreateMap<LoginDto, User>();
-            CreateMap<Role, RoleDto>();
-            CreateMap<RoleDto, Role>();
-            CreateMap<UserRoleDto, UserRole>();
-            CreateMap<UserRole, UserRoleDto>();
+            CreateMap<IdentityUser,UserDto>();
+            CreateMap<UserDto, IdentityUser>();
+            CreateMap<IdentityUser, LoginDto>();
+            CreateMap<LoginDto, IdentityUser>();
+            CreateMap<IdentityRole, RoleDto>();
+            CreateMap<RoleDto, IdentityRole>();
+            CreateMap<UserRoleDto, IdentityUserRole<string>> ();
+            CreateMap<IdentityUserRole<string>, UserRoleDto>();
         }
     }
 }
