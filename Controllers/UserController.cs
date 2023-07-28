@@ -74,11 +74,11 @@ namespace UserManagementSystem.Controllers
 
         [AllowAnonymous]
         [HttpGet("GetAllPagination")]
-        public async Task<IActionResult> Get([FromQuery] int page = 1, [FromQuery] int pageSize = 10, [FromQuery] string filter = "", [FromQuery] string searchBy = "", [FromQuery] string sortBy = "", [FromQuery] bool ascending = true)
+        public async Task<IActionResult> Get([FromQuery] int page = 1, [FromQuery] int pageSize = 10, [FromQuery] string searchBy = "", [FromQuery] string sortBy = "")
         {
             try
             {
-                var users = await _userService.GetUsersWithPagination(page, pageSize, searchBy, filter, sortBy, ascending);
+                var users = await _userService.GetUsersWithPagination(page, pageSize, searchBy, sortBy);
                 return Ok((users.Select(c => _mapper.Map<UserDto>(c)).ToList()), "This is the list of all users");
             }
             catch (Exception ex)

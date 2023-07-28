@@ -76,25 +76,23 @@ namespace UserManagementSystem.GenericRepository
         public async Task<IEnumerable<TEntity>> GetAllpagedAsync(
         int page = 1,
         int pageSize = 10,
-        string filter = null,
         string searchBy = null,
-        string sortBy = null,
-        bool ascending = true)
+        string sortBy = null
+        )
         {
             IQueryable<TEntity> query = _context.Set<TEntity>();
 
             // Apply filtering
-            if (!string.IsNullOrEmpty(filter) && !string.IsNullOrEmpty(searchBy))
+            if (!string.IsNullOrEmpty(searchBy))
             {
-                //var filterExpression = CreateFilterExpression(filter, searchBy);
+             
                 query = query.Where(searchBy);
             }
 
             // Apply sorting
             if (!string.IsNullOrEmpty(sortBy))
             {
-                //  var orderByExpression = CreateOrderByExpression(sortBy);
-              
+               
                 query =  query.OrderBy(sortBy);
             }
 
@@ -105,23 +103,7 @@ namespace UserManagementSystem.GenericRepository
             return await query.ToListAsync();
         }
 
-        private Expression<Func<TEntity, bool>> CreateFilterExpression(string filter, string searchBy)
-        {
-            var parameter = Expression.Parameter(typeof(TEntity), "x");
-            var property = Expression.Property(parameter, searchBy);
-            var constant = Expression.Constant(filter);
-            var startsWithMethod = typeof(string).GetMethod("StartsWith", new[] { typeof(string) });
-            var startsWithExpression = Expression.Call(property, startsWithMethod, constant);
-            return Expression.Lambda<Func<TEntity, bool>>(startsWithExpression, parameter);
-        }
-
-        private Expression<Func<TEntity, object>> CreateOrderByExpression(string sortBy)
-        {
-            var parameter = Expression.Parameter(typeof(TEntity), "x");
-            var property = Expression.Property(parameter, sortBy);
-            return Expression.Lambda<Func<TEntity, object>>(property, parameter);
-        }
-
+  
         
     }
 }

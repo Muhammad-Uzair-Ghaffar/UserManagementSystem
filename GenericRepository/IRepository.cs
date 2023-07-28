@@ -6,7 +6,7 @@ namespace UserManagementSystem.GenericRepository
     {
 
         Task<List<TEntity>> GetAllAsync();
-        Task<IEnumerable<TEntity>> GetAllpagedAsync(int page, int pageSize, string filter, string searchBy, string sortBy, bool ascending);
+        Task<IEnumerable<TEntity>> GetAllpagedAsync(int page, int pageSize, string searchBy, string sortBy);
         Task<TEntity> GetById(string id);
         Task<TEntity> GetByName(string name);
         IQueryable<TEntity> GetQueryable();

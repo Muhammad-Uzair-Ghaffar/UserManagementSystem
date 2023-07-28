@@ -58,10 +58,10 @@ namespace UserManagementSystem.Services.UserService
             return dbuser;
             
         } 
-        public async Task<List<IdentityUser>> GetUsersWithPagination(int page, int pageSize, string filter, string searchBy, string sortBy, bool ascending)
+        public async Task<List<IdentityUser>> GetUsersWithPagination(int page, int pageSize, string searchBy, string sortBy)
         {
 
-            return (await _userRepository.GetAllpagedAsync(page, pageSize, filter, searchBy, sortBy, ascending)).ToList();
+            return (await _userRepository.GetAllpagedAsync(page, pageSize, searchBy, sortBy)).ToList();
             
         }
 

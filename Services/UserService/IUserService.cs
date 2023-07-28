@@ -11,7 +11,7 @@ namespace UserManagementSystem.Services.UserService
     public interface IUserService
     {
         Task<List<IdentityUser>> GetAllUsers();
-        Task<List<IdentityUser>> GetUsersWithPagination(int page, int pageSize, string searchBy, string filter, string sortBy, bool ascending);
+        Task<List<IdentityUser>> GetUsersWithPagination(int page, int pageSize, string searchBy, string sortBy);
         Task<IdentityUser> GetUserById(string id);
         // Task<List<IdentityUser>> AddUser(IdentityUser newUser);
          Task<IdentityUser> DeleteUser(string id);
