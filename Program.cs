@@ -22,12 +22,12 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
 }).AddEntityFrameworkStores<AppDBContext>().AddDefaultTokenProviders(); ;
 builder.Services.AddDbContext<AppDBContext>(options =>  options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
 
-var smtpServer = configuration.GetSection("AppSettings:SmtpServer").Value;
-var smtpPort = int.Parse(configuration.GetSection("AppSettings:SmtpPort").Value);
-var smtpUsername = configuration.GetSection("AppSettings:SenderEmail").Value;
-var smtpPassword = configuration.GetSection("AppSettings:SenderEmailPassword").Value;
+//var smtpServer = configuration.GetSection("AppSettings:SmtpServer").Value;
+//var smtpPort = int.Parse(configuration.GetSection("AppSettings:SmtpPort").Value);
+//var smtpUsername = configuration.GetSection("AppSettings:SenderEmail").Value;
+//var smtpPassword = configuration.GetSection("AppSettings:SenderEmailPassword").Value;
 
-builder.Services.AddTransient<IEmailService>(x => new EmailService(smtpServer, smtpPort, smtpUsername, smtpPassword));
+builder.Services.AddTransient<IEmailService, EmailService>();
 builder.Services.AddControllers();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
@@ -45,7 +45,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
                         IssuerSigningKey = new SymmetricSecurityKey(
-                            Encoding.ASCII.GetBytes(configuration.GetSection("AppSettings:Secret").Value)
+                            Encoding.ASCII.GetBytes(configuration.GetSection("AppSettings:Jwt:Secret").Value)
                         ),
                         ValidateIssuerSigningKey = true,
                         ValidateIssuer = false,

@@ -85,14 +85,12 @@ namespace UserManagementSystem.GenericRepository
             // Apply filtering
             if (!string.IsNullOrEmpty(searchBy))
             {
-             
                 query = query.Where(searchBy);
             }
 
             // Apply sorting
             if (!string.IsNullOrEmpty(sortBy))
             {
-               
                 query =  query.OrderBy(sortBy);
             }
 

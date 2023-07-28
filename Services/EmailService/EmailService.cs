@@ -6,30 +6,33 @@ namespace UserManagementSystem.Services.EmailService
 {
     public class EmailService : IEmailService
     {
+        private readonly IConfiguration _configuration;
         private readonly string _smtpServer;
         private readonly int _smtpPort;
         private readonly string _smtpUsername;
         private readonly string _smtpPassword;
 
-        public EmailService(string smtpServer, int smtpPort, string smtpUsername, string smtpPassword)
+        public EmailService(IConfiguration configuration)
         {
-            _smtpServer = smtpServer;
-            _smtpPort = smtpPort;
-            _smtpUsername = smtpUsername;
-            _smtpPassword = smtpPassword;
+            _configuration = configuration;
         }
 
         public async Task SendEmailAsync(string email, string subject, string message)
         {
-            using (var client = new SmtpClient(_smtpServer, _smtpPort))
+            var smtpServer = _configuration.GetSection("AppSettings:SmtpServerCreds:SmtpServer").Value;
+            var smtpPort = int.Parse(_configuration.GetSection("AppSettings:SmtpServerCreds:SmtpPort").Value);
+            var smtpUsername = _configuration.GetSection("AppSettings:SmtpServerCreds:SenderEmail").Value;
+            var smtpPassword = _configuration.GetSection("AppSettings:SmtpServerCreds:SenderEmailPassword").Value;
+
+            using (var client = new SmtpClient(smtpServer, smtpPort))
             {
                 client.UseDefaultCredentials = false;
-                client.Credentials = new NetworkCredential(_smtpUsername, _smtpPassword);
+                client.Credentials = new NetworkCredential(smtpUsername, smtpPassword);
                 client.EnableSsl = true;
 
                 using (var mailMessage = new MailMessage())
                 {
-                    mailMessage.From = new MailAddress(_smtpUsername); // Replace with your email address
+                    mailMessage.From = new MailAddress(smtpUsername); // Replace with your email address
                     mailMessage.To.Add(email);
                     mailMessage.Subject = subject;
                     mailMessage.Body = message;

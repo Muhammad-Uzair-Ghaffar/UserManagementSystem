@@ -102,7 +102,7 @@ namespace UserManagementSystem.Controllers
         private string CreateJwtToken(IdentityUser user)//, IList<string> roles
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_configuration.GetSection("AppSettings:Secret").Value); 
+            var key = Encoding.ASCII.GetBytes(_configuration.GetSection("AppSettings:Jwt:Secret").Value); 
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {

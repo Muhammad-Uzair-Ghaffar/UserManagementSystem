@@ -27,7 +27,7 @@ namespace UserManagementSystem.Services.AccountService
         public async Task<bool> ConfirmEmailAsync(string token)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_configuration.GetSection("AppSettings:Secret").Value);
+            var key = Encoding.ASCII.GetBytes(_configuration.GetSection("AppSettings:Jwt:Secret").Value);
             tokenHandler.ValidateToken(token, new TokenValidationParameters
             {
                 IssuerSigningKey = new SymmetricSecurityKey(key),
@@ -64,7 +64,7 @@ namespace UserManagementSystem.Services.AccountService
         private string CreateJwtToken(IdentityUser user)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_configuration.GetSection("AppSettings:Secret").Value);
+            var key = Encoding.ASCII.GetBytes(_configuration.GetSection("AppSettings:Jwt:Secret").Value);
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
@@ -124,7 +124,7 @@ namespace UserManagementSystem.Services.AccountService
             {
                 var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                 var jwtToken = CreateJwtToken(user);
-                var baseUrl = _configuration.GetSection("AppSettings:BaseUrl").Value;
+                var baseUrl = _configuration.GetSection("AppSettings:SmtpServerCreds:BaseUrl").Value;
 
                 var confirmationLink = baseUrl + "/" + "Account" + "/" + "ConfirmEmail/" + jwtToken;
                 string emailBody = $@"Please confirm your account by clicking this link: <a href='{confirmationLink}'>Confirm email</a>";
